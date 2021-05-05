@@ -1,0 +1,41 @@
+version: '3.6'
+services:
+  telegraf:
+    env_file: param.env
+    image: telegraf:${Tel_vers}
+    container_name: telegraf
+    restart: always
+    volumes:
+    - ./telegraf/etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - influxdb    
+    ports:
+    - '8125:8125'
+  influxdb:
+    env_file: param.env
+    image: influxdb:${Inf_vers}
+    container_name: influxdb
+    restart: always
+    ports:
+      - '8086:8086'
+    volumes:
+      - /home/desktop/monitiring/influxdb:/var/lib/influxdb  
+    environment:
+      - INFLUXDB_DB=db0
+      - INFLUXDB_ADMIN_USER=${login_I}
+      - INFLUXDB_ADMIN_PASSWORD=${pass_I}    
+  grafana:
+    env_file: param.env
+    image: grafana/grafana:${Graf_vers}
+    container_name: grafana
+    restart: always
+    depends_on:
+      - influxdb
+    ports:
+      - '3000:3000'
+    volumes:
+      - /home/desktop/monitiring/grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${login_G}
+      - GF_SECURITY_ADMIN_PASSWORD=${pass_G}    
+
